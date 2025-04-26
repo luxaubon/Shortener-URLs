@@ -14,6 +14,11 @@ RUN apt-get update && apt-get install -y \
     git \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
+# สร้างและกำหนดสิทธิ์ directory สำหรับ nginx
+RUN mkdir -p /var/log/nginx /var/cache/nginx \
+    && chown -R www-data:www-data /var/log/nginx /var/cache/nginx \
+    && chmod -R 755 /var/log/nginx /var/cache/nginx
+
 # ติดตั้ง Composer
 COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
 
@@ -27,12 +32,13 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # ให้สิทธิ์กับ storage และ bootstrap
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # คัดลอก nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# คัดลอก entrypoint.sh
+# คัดลอก entrypoint.sh และให้สิทธิ์
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
