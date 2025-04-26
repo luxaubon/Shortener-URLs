@@ -3,10 +3,8 @@ nixPkgs = ["php81", "mysql", "curl"]
 
 [phases.install]
 cmds = [
-  "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\"",
-  "php composer-setup.php",
-  "mv composer.phar /usr/local/bin/composer",
-  "composer install --optimize-autoloader --no-dev"
+  # โหลด composer แล้ว install ทันที ไม่ mv แล้ว
+  "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && php composer-setup.php && php composer.phar install --optimize-autoloader --no-dev"
 ]
 
 [phases.build]
