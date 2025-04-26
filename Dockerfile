@@ -1,43 +1,38 @@
-# Use PHP 8.2 FPM Alpine as base image
-FROM php:8.2-fpm-alpine
+FROM php:8.1-fpm
 
-# Install system dependencies
-RUN apk add --no-cache \
-    nginx \
-    postgresql-dev \
-    libzip-dev \
+# ติดตั้ง dependencies
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libonig-dev \
+    libxml2-dev \
     zip \
     unzip \
-    git
+    curl \
+    git \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql zip bcmath
+# ติดตั้ง Composer
+COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
 
-# Install composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Set working directory
+# ตั้งค่า working directory
 WORKDIR /var/www/html
 
-# Copy project files
+# คัดลอกไฟล์ทั้งหมดไปยัง container
 COPY . .
 
-# Install dependencies
+# คัดลอกไฟล์ nginx.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# ติดตั้ง dependencies ของ Laravel
 RUN composer install --no-dev --optimize-autoloader
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage
+# ให้สิทธิ์กับ storage และ bootstrap
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Configure nginx
-COPY nginx.conf /etc/nginx/http.d/default.conf
+# คัดลอก entrypoint.sh
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-# Expose port 80
-EXPOSE 80
-
-# Copy entrypoint
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-# Start container using entrypoint
-CMD ["sh", "/entrypoint.sh"]
+# ตั้งค่า entrypoint
+ENTRYPOINT ["sh", "/usr/local/bin/entrypoint.sh"]
