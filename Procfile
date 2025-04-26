@@ -1,1 +1,1 @@
-web: heroku-php-apache2 public/
+web: /usr/local/bin/entrypoint.sh

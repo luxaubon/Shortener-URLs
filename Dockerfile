@@ -2,6 +2,7 @@ FROM php:8.1-fpm
 
 # ติดตั้ง dependencies
 RUN apt-get update && apt-get install -y \
+    nginx \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
@@ -28,8 +29,12 @@ RUN composer install --no-dev --optimize-autoloader
 # ให้สิทธิ์กับ storage และ bootstrap
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
+# คัดลอก nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # คัดลอก entrypoint.sh
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # ตั้งค่า entrypoint
 ENTRYPOINT ["sh", "/usr/local/bin/entrypoint.sh"]

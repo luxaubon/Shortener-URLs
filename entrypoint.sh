@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # ถ้าไม่มี .env ให้ copy จาก .env.example
 if [ ! -f .env ]; then
@@ -12,15 +12,9 @@ if [ -z "$(grep ^APP_KEY= .env | cut -d '=' -f2)" ]; then
     php artisan key:generate
 fi
 
-# ทำ cache config
-php artisan config:cache#!/bin/bash
-
-# รันคำสั่ง migrations และ cache
+# ทำ cache config และ migration
 php artisan config:cache
 php artisan migrate --force
-
-# เริ่มต้น PHP-FPM
-php-fpm
 
 # start nginx และ php-fpm
 nginx && php-fpm
