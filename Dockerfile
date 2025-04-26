@@ -17,14 +17,16 @@ RUN apt-get update && apt-get install -y \
 
 # สร้างและกำหนดสิทธิ์ directories ที่จำเป็น
 RUN mkdir -p /run/nginx \
-    && mkdir -p /var/log/nginx /var/cache/nginx \
+    /var/log/nginx \
+    /var/cache/nginx \
+    /var/www/html/storage/framework/{sessions,views,cache} \
+    /var/www/html/bootstrap/cache \
     && chown -R www-data:www-data /var/log/nginx /var/cache/nginx /run/nginx
 
-# ตั้งค่า PHP และ environment variables
-ENV PHP_OPCACHE_ENABLE=1 \
-    PHP_OPCACHE_ENABLE_CLI=1 \
-    PHP_OPCACHE_VALIDATE_TIMESTAMPS=1 \
-    PHP_OPCACHE_REVALIDATE_FREQ=0
+# ตั้งค่า PHP
+COPY php.ini-production /usr/local/etc/php/php.ini
+RUN sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 64M/' /usr/local/etc/php/php.ini \
+    && sed -i 's/post_max_size = 8M/post_max_size = 64M/' /usr/local/etc/php/php.ini
 
 # ติดตั้ง Composer
 COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
@@ -37,7 +39,6 @@ COPY . .
 
 # ติดตั้ง dependencies ของ Laravel และ optimize
 RUN composer install --no-dev --optimize-autoloader --no-scripts \
-    && mkdir -p storage/framework/{sessions,views,cache} \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
     && chmod -R 775 storage bootstrap/cache
@@ -49,10 +50,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# เปลี่ยน user เป็น www-data
-USER www-data
-
 EXPOSE 80
 
 # ตั้งค่า entrypoint
-ENTRYPOINT ["sh", "/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
