@@ -35,11 +35,9 @@ COPY nginx.conf /etc/nginx/http.d/default.conf
 # Expose port 80
 EXPOSE 80
 
-# Start script
-CMD ["sh", "-c", "\
-    cp .env.example .env && \
-    php artisan key:generate && \
-    php artisan config:cache && \
-    nginx && \
-    php-fpm \
-"]
+# Copy entrypoint
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Start container using entrypoint
+CMD ["sh", "/entrypoint.sh"]
