@@ -14,14 +14,14 @@ use App\Http\Controllers\HomeController;
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/hello', function () {
+    return 'Hello from Railway!';
+});
 
-// Home route for authenticated users
 Route::get('/', [HomeController::class, 'index'])
     ->middleware(['auth'])
     ->name('home');
+
 
 // Include route files
 require __DIR__.'/auth.php';
