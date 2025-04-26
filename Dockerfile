@@ -22,9 +22,6 @@ WORKDIR /var/www/html
 # คัดลอกไฟล์ทั้งหมดไปยัง container
 COPY . .
 
-# คัดลอกไฟล์ nginx.conf
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
 # ติดตั้ง dependencies ของ Laravel
 RUN composer install --no-dev --optimize-autoloader
 

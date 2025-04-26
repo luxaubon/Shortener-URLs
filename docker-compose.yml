@@ -16,8 +16,6 @@ services:
       DB_DATABASE: shortenurls
       DB_USERNAME: testuser
       DB_PASSWORD: testpass123
-    volumes:
-      - .:/var/www/html
     networks:
       - app-network
 

@@ -13,7 +13,14 @@ if [ -z "$(grep ^APP_KEY= .env | cut -d '=' -f2)" ]; then
 fi
 
 # ทำ cache config
+php artisan config:cache#!/bin/bash
+
+# รันคำสั่ง migrations และ cache
 php artisan config:cache
+php artisan migrate --force
+
+# เริ่มต้น PHP-FPM
+php-fpm
 
 # start nginx และ php-fpm
 nginx && php-fpm
