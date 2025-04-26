@@ -15,13 +15,20 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd \
     && rm -rf /var/lib/apt/lists/*
 
+# Configure PHP-FPM to use unix socket
+RUN mkdir -p /var/run && \
+    echo "listen = /var/run/php-fpm.sock" >> /usr/local/etc/php-fpm.d/www.conf && \
+    echo "listen.mode = 0666" >> /usr/local/etc/php-fpm.d/www.conf && \
+    echo "listen.owner = www-data" >> /usr/local/etc/php-fpm.d/www.conf && \
+    echo "listen.group = www-data" >> /usr/local/etc/php-fpm.d/www.conf
+
 # สร้างและกำหนดสิทธิ์ directories ที่จำเป็น
 RUN mkdir -p /run/nginx \
     /var/log/nginx \
     /var/cache/nginx \
     /var/www/html/storage/framework/{sessions,views,cache} \
     /var/www/html/bootstrap/cache \
-    && chown -R www-data:www-data /var/log/nginx /var/cache/nginx /run/nginx
+    && chown -R www-data:www-data /var/log/nginx /var/cache/nginx /run/nginx /var/run
 
 # ตั้งค่า PHP
 RUN echo "upload_max_filesize = 64M" > /usr/local/etc/php/conf.d/uploads.ini \
