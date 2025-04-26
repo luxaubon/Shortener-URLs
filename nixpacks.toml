@@ -1,2 +1,19 @@
 [phases.setup]
-nixPkgs = ["php81", "composer", "mysql"]
+nixPkgs = ["php81", "mysql"]
+
+[phases.install]
+cmds = [
+  "curl -sS https://getcomposer.org/installer | php",
+  "mv composer.phar /usr/local/bin/composer",
+  "composer install --optimize-autoloader --no-dev"
+]
+
+[phases.build]
+cmds = [
+  "php artisan config:cache",
+  "php artisan route:cache",
+  "php artisan view:cache"
+]
+
+[start]
+cmd = "php artisan serve --host=0.0.0.0 --port=8000"
