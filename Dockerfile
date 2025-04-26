@@ -24,9 +24,8 @@ RUN mkdir -p /run/nginx \
     && chown -R www-data:www-data /var/log/nginx /var/cache/nginx /run/nginx
 
 # ตั้งค่า PHP
-COPY php.ini-production /usr/local/etc/php/php.ini
-RUN sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 64M/' /usr/local/etc/php/php.ini \
-    && sed -i 's/post_max_size = 8M/post_max_size = 64M/' /usr/local/etc/php/php.ini
+RUN echo "upload_max_filesize = 64M" > /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "post_max_size = 64M" >> /usr/local/etc/php/conf.d/uploads.ini
 
 # ติดตั้ง Composer
 COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
