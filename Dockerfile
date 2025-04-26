@@ -25,9 +25,6 @@ COPY . .
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Generate application key
-RUN php artisan key:generate
-
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage
@@ -38,5 +35,11 @@ COPY nginx.conf /etc/nginx/http.d/default.conf
 # Expose port 80
 EXPOSE 80
 
-# Start nginx and php-fpm
-CMD ["sh", "-c", "nginx && php-fpm"]
+# Start script
+CMD ["sh", "-c", "\
+    cp .env.example .env && \
+    php artisan key:generate && \
+    php artisan config:cache && \
+    nginx && \
+    php-fpm \
+"]
