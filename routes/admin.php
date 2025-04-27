@@ -8,10 +8,7 @@ use App\Http\Controllers\Admin\UrlController as AdminUrlController;
 use App\Http\Controllers\Admin\DashboardController;
 
 Route::middleware(['web', 'guest', 'throttle:5,1'])->group(function () {
-    Route::get('/admin', function () {
-        return view('admin.login');
-    })->name('admin.login');
-
+    Route::get('/admin', [LoginController::class, 'showLoginForm'])->name('admin.login');
     Route::post('/admin/login', [LoginController::class, 'store'])->name('admin.login.submit');
 });
 
